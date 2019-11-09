@@ -1,0 +1,83 @@
+<html lang=”en”>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<script src="https://cdn.jsdelivr.net/npm/fortmatic@latest/dist/fortmatic.js"></script>
+		<!-- Name of the app -->
+		<title>GIUCAM App</title>
+
+		<!-- Link to main style sheet -->
+		<link rel="stylesheet" href="style.css"> 
+		
+	</head>
+	<body>
+		<div>
+		<p id='balance'></p>
+		<!-- Camera -->
+		<main id="camera">
+
+		    <!-- Camera sensor -->
+		    <canvas id="camera--sensor"></canvas>
+		    
+		    <!-- Camera view -->
+		    <video id="camera--view" autoplay playsinline></video>
+		    
+		    <!-- Camera output -->
+		    <img src="//:0" alt="" id="camera--output">
+
+		    <!-- Camera trigger -->
+		    <button id="camera--trigger">Take a picture</button>
+
+		</main>
+		</div>
+		<!-- Reference to your JavaScript file -->
+		<script src="cameraApp.js"></script> 
+
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" crossorigin="anonymous"></script>
+		<script src="./web3.min.js"></script>
+	
+		<script>
+			var contract;
+	
+			$(document).ready(function() {
+				initContract();
+				getBalance();
+			})
+	
+			function initContract() {
+
+				let fm = new Fortmatic('pk_test_E388041C5963490F');
+				web3 = new Web3(fm.getProvider());
+				var address = "0xd5501A1C6851e6C9F9c8E9e38DDA52bc9fa32bbB";
+				var abi = [ { "constant": true, "inputs": [], "name": "getBalance", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "withdraw", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [ { "internalType": "address", "name": "", "type": "address" }, { "internalType": "uint256", "name": "", "type": "uint256" } ], "name": "greenAssets", "outputs": [ { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "location", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": true, "inputs": [], "name": "getNumberofGreenAssets", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [], "name": "destroy", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "owner", "outputs": [ { "internalType": "address payable", "name": "", "type": "address" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [ { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "location", "type": "string" } ], "name": "addGreenAsset", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [], "name": "getLocation", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [], "name": "deposit", "outputs": [], "payable": true, "stateMutability": "payable", "type": "function" }, { "inputs": [ { "internalType": "string", "name": "location", "type": "string" } ], "payable": false, "stateMutability": "nonpayable", "type": "constructor" } ];
+	
+				contract = new web3.eth.Contract(abi, address);
+			}
+	
+			function getBalance() {
+				contract.methods.getBalance().call().then((result) => {
+					$('#balance').html(result);
+				})
+			}
+	
+			$('#camera--trigger').click(function() {
+				web3.eth.getAccounts().then(function(accounts) {
+					var acct = accounts[0];
+					return contract.methods.addGreenAsset("Tree", "Toronto").send({from: acct});
+				}).then(function(tx) {
+					console.log(tx);
+					var curr = parseInt($('#balance').html());
+					$('#balance').html(curr);
+				}).catch(function(err) {
+					console.log(err);
+				})
+			})
+	
+			// Implement decrement and reset as homework
+		</script>
+	
+
+
+	</body>
+</html>
